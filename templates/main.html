@@ -36,13 +36,15 @@
       }
     }
   </style>
-
   
   <!-- Custom styles for this template -->
   <link href="{{url_for('static', filename='css/cover.css')}}" rel="stylesheet">
+
+
 </head>
 
 <script src="{{url_for('static', filename='js/uploader.js')}}"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <body class="d-flex h-100 text-center text-white bg-dark">
   <link href="{{url_for('static', filename='css/uploader.css')}}" rel="stylesheet">
   
@@ -73,7 +75,38 @@
                   <input id="upload" type="file" name="image" onchange="readImg(this)"  class="form-control border-0">
                   <label id="upload-label" for="upload" class="text-center font-weight-light text-muted text-uppercase">Choose file</label>
 
-                  <input type="submit" class="btn btn-light m-0 rounded-pill px-4 font-weight-bold text-muted text-uppercase" value="Submit">
+                  <input type="submit" class="btn btn-light m-0 rounded-pill px-4 font-weight-bold text-muted text-uppercase" value="Submit" onclick="submission_click()">
+                  <script>
+                      function submission_click(){
+                          alert("Hello! I am an alert box!!");
+
+                          const image = document.getElementById('upload').files[0];
+                          console.log(typeof image)
+
+                          let formData = new FormData();
+                          formData.append('file', image)
+                          console.log('>> formData >> ', formData);
+
+
+                          //axios.post('http://0.0.0.0/file',
+                          //    formData, {headers: {'Content-Type': 'multipart/form-data'}}
+                          //).then((response) => {
+                          //    alert(response);
+                          //}, (error) => {
+                           //   alert(error);
+                          //});
+
+                          axios.get('http://0.0.0.0/todos')
+                              .then((response) => {
+                                  console.log(response.data);
+                                  console.log(response.status);
+                                  console.log(response.statusText);
+                                  console.log(response.headers);
+                                  console.log(response.config);
+                              });
+                      }
+                  </script>
+
               </form>
           </div>
       </div>
