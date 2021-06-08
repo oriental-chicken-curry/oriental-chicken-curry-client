@@ -37,6 +37,14 @@
     z-index: 1;
 }
 
+.latex-area::before {
+    display: none
+}
+
+.latex-area {
+    display: none;    
+}
+
 .image-area img {
     z-index: 2;
     position: relative;

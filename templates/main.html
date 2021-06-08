@@ -7,7 +7,9 @@
   <title>OCR : Oriental Chicken cuRry</title>
 
   <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/cover/">
-  
+  <script type="text/javascript"
+     src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
 
   <!-- Bootstrap core CSS -->
 <link href="{{url_for('static', filename='css/main.min.css')}}" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
@@ -73,13 +75,15 @@
 
               <!-- Uploaded image area-->
               <div class="image-area mb-4"><img id="imageResult" src="" alt="" class="img-fluid rounded shadow-sm mx-auto d-block"></div>
-              <!-- <p class="font-italic text-white text-center">Check the image before click Submit.</p> -->
+              <div class="latex-area mb-4"><p style="font-size:1.5em" id="latexResult"></p></div>
               
               <!-- Upload image input-->
               <form method="post" enctype="multipart/form-data" class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
-                  <input id="upload" type="file" name="image" onchange="getImgName(this)"  class="form-control border-0">
+                  <input id="upload" type="file" name="image" onchange="getImgName(this)" class="form-control border-0">
                   <script>
                     function getImgName( input ) {
+                        document.getElementById("latexResult").innerHTML = ""
+
                         if (input.files && input.files[0]) {
                             var fileName = input.files[0].name;
                             var infoArea = document.getElementById( 'upload-label')
@@ -225,15 +229,20 @@
                             console.log(">> Check", imgArea);
 
                             axios.post('http://0.0.0.0:8080/file',
-                                              formData, {headers: {'Content-Type': 'multipart/form-data'}}
-                                              ).then((response) => {
-                                                  alert(response);
-                                              }, (error) => {
-                                                  alert(error);
-                                              });
+                                        formData, {headers: {'Content-Type': 'multipart/form-data'}}
+                                        ).then((response) => {
+                                            alert(response);
+                                            var start = "$$"
+                                            var latex = response.data
+                                            var end = "$$"
+                                            document.getElementById('latexResult').innerHTML = start + latex + end
+                                            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                                        }, (error) => {
+                                            alert(error);
+                                        });
                           });
                         });
-                  </script>
+                    </script>
               </form>
           </div>
       </div>
