@@ -158,7 +158,7 @@
                           $modal.on('shown.bs.modal', function () {
                             cropper = new Cropper(modalImage, {
                               aspectRatio: NaN,
-                              viewMode: 3,
+                              viewMode: 2,
                             });
                           }).on('hidden.bs.modal', function () {
                             cropper.destroy();
@@ -175,8 +175,7 @@
                               canvas = cropper.getCroppedCanvas({});
                               $alert.removeClass('alert-success alert-warning');
                               canvas.toBlob(function (blob) {
-                                console.log('>> formData >> ', blob);
-                                var file = new File([blob], "img");            
+                                var file = new File([blob], "img");
                                 var formData = new FormData();
                                 
                                 // show cropped image
@@ -191,15 +190,47 @@
 
                                 formData.append('file', file);
                                 // http://3.36.153.198:8080/file
-                                axios.post('http://0.0.0.0:8080/file',
-                                                  formData, {headers: {'Content-Type': 'multipart/form-data'}}
+                              });
+
+                            }
+                          });
+
+                          function dataURItoBlob(dataURI) {
+                              // convert base64/URLEncoded data component to raw binary data held in a string
+                              var byteString;
+                              if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                                  byteString = atob(dataURI.split(',')[1]);
+                              else
+                                  byteString = unescape(dataURI.split(',')[1]);
+
+                              // separate out the mime component
+                              var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+                              // write the bytes of the string to a typed array
+                              var ia = new Uint8Array(byteString.length);
+                              for (var i = 0; i < byteString.length; i++) {
+                                  ia[i] = byteString.charCodeAt(i);
+                              }
+
+                              return new Blob([ia], {type:mimeString});
+                          }
+
+                          document.getElementById("Result").addEventListener("click", function() {
+                            var imgArea = document.getElementById("imageResult")
+                            var blob = dataURItoBlob(imgArea.src)
+                            var formData = new FormData();
+                            
+                            formData.append("file", blob);
+                            console.log(">> Check", blob);
+                            console.log(">> Check", imgArea);
+
+                            axios.post('http://0.0.0.0:8080/file',
+                                              formData, {headers: {'Content-Type': 'multipart/form-data'}}
                                               ).then((response) => {
                                                   alert(response);
                                               }, (error) => {
                                                   alert(error);
                                               });
-                              });
-                            }
                           });
                         });
                   </script>
