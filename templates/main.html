@@ -1,0 +1,210 @@
+<html lang="en" class="h-100"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+  <meta name="generator" content="Hugo 0.83.1">
+  <title>OCR : Oriental Chicken cuRry</title>
+
+  <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/cover/">
+  
+
+  <!-- Bootstrap core CSS -->
+<link href="{{url_for('static', filename='css/main.min.css')}}" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+<!-- <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css" crossorigin="anonymous"> -->
+<link rel="stylesheet" href="../static/css/cropper.css">
+
+
+  <!-- Favicons -->
+<link rel="apple-touch-icon" href="https://getbootstrap.com/docs/5.0/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+<link rel="icon" href="https://getbootstrap.com/docs/5.0/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="https://getbootstrap.com/docs/5.0/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+<link rel="manifest" href="https://getbootstrap.com/docs/5.0/assets/img/favicons/manifest.json">
+<link rel="mask-icon" href="https://getbootstrap.com/docs/5.0/assets/img/favicons/safari-pinned-tab.svg" color="#7952b3">
+<link rel="icon" href="https://getbootstrap.com/docs/5.0/assets/img/favicons/favicon.ico">
+<meta name="theme-color" content="#7952b3">
+
+
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+
+    .img-container img {
+      max-width: 100%;
+    }
+
+    .alert {
+      display: none;
+    }
+  </style>
+  
+  <!-- Custom styles for this template -->
+  <link href="{{url_for('static', filename='css/cover.css')}}" rel="stylesheet">
+
+
+</head>
+
+<script src="{{url_for('static', filename='js/uploader.js')}}"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body class="d-flex h-100 text-center text-white bg-dark">
+  <link href="{{url_for('static', filename='css/uploader.css')}}" rel="stylesheet">
+  
+  
+  <div class="container py-5">
+      <!-- For demo purpose -->
+      <header class="text-white text-center">
+          <img src="{{url_for('static', filename='images/ocr_logo.png')}}" alt="" width="500" class="mb-4">
+      </header>
+
+
+      <div class="row py-4">
+          <div class="col-lg-6 mx-auto">
+
+              <!-- Uploaded image area-->
+              <div class="image-area mb-4"><img id="imageResult" src="" alt="" class="img-fluid rounded shadow-sm mx-auto d-block"></div>
+              <!-- <p class="font-italic text-white text-center">Check the image before click Submit.</p> -->
+              
+              <!-- Upload image input-->
+              <form method="post" enctype="multipart/form-data" class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
+                  <input id="upload" type="file" name="image" onchange="getImgName(this)"  class="form-control border-0">
+                  <script>
+                    function getImgName( input ) {
+                        if (input.files && input.files[0]) {
+                            var fileName = input.files[0].name;
+                            var infoArea = document.getElementById( 'upload-label')
+                            infoArea.textContent = fileName;
+                        }
+                      }
+                  </script>
+                  <!-- <input id="upload" type="file" name="image" class="form-control border-0"> -->
+                  <label id="upload-label" for="upload" class="text-center font-weight-light text-muted text-uppercase">Choose file</label>
+                  <div class="alert" role="alert"></div>
+                  <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="modalLabel">Crop the image</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <div class="img-container">
+                            <img id="modal-image" src="https://avatars0.githubusercontent.com/u/3456749">
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                          <button type="button" class="btn btn-primary" id="crop">Crop</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <input id="Result" type="button" class="btn btn-light m-0 rounded-pill px-4 font-weight-bold text-muted text-uppercase" value="Result">
+                  <script src="https://unpkg.com/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
+                  <script src="https://unpkg.com/bootstrap@4/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+                  <script src="../static/js/cropper.js"></script>
+                  <script>
+                      window.addEventListener('DOMContentLoaded', function () {
+                          var input = document.getElementById('upload');
+                          var modalImage = document.getElementById('modal-image')
+                          var $alert = $('.alert');
+                          var $modal = $('#modal');
+                          var $progress = $('.progress');
+                          var $progressBar = $('.progress-bar');
+                          var cropper;
+
+                          $('[data-toggle="tooltip"]').tooltip();
+
+                          input.addEventListener('change', function (e) {
+                            var files = e.target.files;
+                            var done = function (url) {
+                              input.value = '';
+                              modalImage.src = url
+                              $alert.hide();
+                              $modal.modal('show');
+                            };
+                            var reader;
+                            var file;
+                            var url;
+
+                            if (files && files.length > 0) {
+                              file = files[0];
+
+                              if (URL) {
+                                done(URL.createObjectURL(file));
+                              } else if (FileReader) {
+                                reader = new FileReader();
+                                reader.onload = function (e) {
+                                  done(reader.result);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }
+                          });
+
+                          $modal.on('shown.bs.modal', function () {
+                            cropper = new Cropper(modalImage, {
+                              aspectRatio: NaN,
+                              viewMode: 3,
+                            });
+                          }).on('hidden.bs.modal', function () {
+                            cropper.destroy();
+                            cropper = null;
+                          });
+
+                          document.getElementById('crop').addEventListener('click', function () {
+                            var initialAvatarURL;
+                            var canvas;
+
+                            $modal.modal('hide');
+
+                            if (cropper) {
+                              canvas = cropper.getCroppedCanvas({});
+                              $alert.removeClass('alert-success alert-warning');
+                              canvas.toBlob(function (blob) {
+                                console.log('>> formData >> ', blob);
+                                var file = new File([blob], "img");            
+                                var formData = new FormData();
+                                
+                                // show cropped image
+                                var reader = new FileReader();
+                                var imgArea = document.getElementById("imageResult")
+                                reader.onload = function (e) {
+                                    var dataUri = e.target.result
+                                    imgArea.src = dataUri;
+                                };
+                                reader.readAsDataURL(file);
+                                // infoArea.textContent = fileName;
+
+                                formData.append('file', file);
+                                // http://3.36.153.198:8080/file
+                                axios.post('http://0.0.0.0:8080/file',
+                                                  formData, {headers: {'Content-Type': 'multipart/form-data'}}
+                                              ).then((response) => {
+                                                  alert(response);
+                                              }, (error) => {
+                                                  alert(error);
+                                              });
+                              });
+                            }
+                          });
+                        });
+                  </script>
+              </form>
+          </div>
+      </div>
+  </div>
+</body>
