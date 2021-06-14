@@ -12,7 +12,8 @@
   </script>
 
   <!-- Bootstrap core CSS -->
-<link href="{{url_for('static', filename='css/main.min.css')}}" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script> -->
 <!-- <link rel="stylesheet" href="https://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css" crossorigin="anonymous"> -->
 <link rel="stylesheet" href="../static/css/cropper.css">
 
@@ -75,8 +76,7 @@
 
               <!-- Uploaded image area-->
               <div class="image-area mb-4"><img id="imageResult" src="" alt="" class="img-fluid rounded shadow-sm mx-auto d-block"></div>
-              <div class="latex-area mb-4"><p style="font-size:1.5em" id="latexResult"></p></div>
-              
+              <h3 id="latexResult"></h3>
               <!-- Upload image input-->
               <form method="post" enctype="multipart/form-data" class="input-group mb-3 px-2 py-2 rounded-pill bg-white shadow-sm">
                   <input id="upload" type="file" name="image" onchange="getImgName(this)" class="form-control border-0">
@@ -105,7 +105,7 @@
                         </div>
                         <div class="modal-body">
                           <div class="img-container">
-                            <img id="modal-image" src="https://avatars0.githubusercontent.com/u/3456749">
+                            <img id="modal-image" src="../static/images/pizza.png">
                           </div>
                         </div>
                         <div class="modal-footer">
@@ -116,7 +116,7 @@
                     </div>
                   </div>
 
-                  <input id="Result" type="button" class="btn btn-light m-0 rounded-pill px-4 font-weight-bold text-muted text-uppercase" value="Result">
+                  <input id="Result" type="button" class="btn btn-light m-0 rounded-pill px-4 font-weight-bold text-muted text-uppercase" value="Result">                  
                   <script src="https://unpkg.com/jquery@3/dist/jquery.min.js" crossorigin="anonymous"></script>
                   <script src="https://unpkg.com/bootstrap@4/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
                   <script src="../static/js/cropper.js"></script>
@@ -219,7 +219,7 @@
                               return new Blob([ia], {type:mimeString});
                           }
 
-                          document.getElementById("Result").addEventListener("click", function() {
+                            document.getElementById("Result").addEventListener("click", function() {
                             var imgArea = document.getElementById("imageResult")
                             var blob = dataURItoBlob(imgArea.src)
                             var formData = new FormData();
@@ -228,23 +228,24 @@
                             console.log(">> Check", blob);
                             console.log(">> Check", imgArea);
 
-                            axios.post('http://0.0.0.0:8080/file',
+                            axios.post('http://127.0.0.1:8080/file',
                                         formData, {headers: {'Content-Type': 'multipart/form-data'}}
                                         ).then((response) => {
-                                            alert(response);
+                                            //alert(response);
                                             var start = "$$"
                                             var latex = response.data
                                             var end = "$$"
                                             document.getElementById('latexResult').innerHTML = start + latex + end
-                                            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                                            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                                            //alert(document.getElementById('latexResult').innerHTML = start + latex + end)
                                         }, (error) => {
                                             alert(error);
                                         });
                           });
                         });
-                    </script>
-              </form>
-          </div>
+                    </script>                    
+              </form>              
+          </div>          
       </div>
   </div>
 </body>
